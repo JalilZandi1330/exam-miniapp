@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
 import sqlite3
+import json
 import os
 
 app = FastAPI(title="Telegram Exam MiniApp API")
@@ -17,6 +18,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT,
             username TEXT,
+            subject TEXT,
             score REAL,
             correct int,
             incorrect int,
@@ -29,13 +31,14 @@ def init_db():
 
 init_db()
 
-class SubmitRequest(BaseModel):
-    user_id: str
-    username: str
-    answers: Dict[str, int] # question_id -> selected_option
+# Load geometry questions
+GEOMETRY_QUESTIONS = []
+if os.path.exists("geometry_questions.json"):
+    with open("geometry_questions.json", "r", encoding="utf-8") as f:
+        GEOMETRY_QUESTIONS = json.load(f)
 
-# Mock questions database extracted from PDF
-QUESTIONS = [
+# Mock Chemistry questions
+CHEMISTRY_QUESTIONS = [
     {
         "id": 1,
         "question": "کدام گزینه نادرست است؟",
@@ -55,23 +58,42 @@ QUESTIONS = [
     }
 ]
 
-@app.get("/api/questions")
-def get_questions():
-    # Hide correct answers from client
-    safe_q = [{"id": q["id"], "question": q["question"], "options": q["options"]} for q in QUESTIONS]
-    return {"questions": safe_q}
+class SubmitRequest(BaseModel):
+    user_id: str
+    username: str
+    subject: str # 'chem' or 'geom'
+    answers: Dict[str, int]
+
+@app.get("/api/questions/{subject}")
+def get_questions(subject: str):
+    if subject == "chem":
+        safe_q = [{"id": q["id"], "question": q["question"], "options": q["options"]} for q in CHEMISTRY_QUESTIONS]
+        return {"questions": safe_q}
+    elif subject == "geom":
+        # Return first 20 geometry questions as a sample test
+        sample = GEOMETRY_QUESTIONS[:20]
+        formatted = []
+        for idx, q in enumerate(sample):
+            formatted.append({
+                "id": idx + 1,
+                "question": f"(تست شماره {q['number']} - صفحه {q['page']})\n{q['content'][:200]}",
+                "options": ["گزینه ۱", "گزینه ۲", "گزینه ۳", "گزینه ۴"]
+            })
+        return {"questions": formatted}
+    else:
+    raise HTTPException(status_code=404, detail="Subject not found")
 
 @app.post("/api/submit")
 def submit_exam(sub: SubmitRequest):
+    total = 20 if sub.subject == "geom" else len(CHEMISTRY_QUESTIONS)
     correct_count = 0
-    total = len(QUESTIONS)
     
-    for q in QUESTIONS:
-        qid_str = str(q["id"])
-        if qid_str in sub.answers:
-            if sub.answers[qid_str] == q["correct"]:
-                correct_count += 1
-                
+    # Simple scoring logic
+    for qid, ans in sub.answers.items():
+        # Mock grading
+        if int(ans) == 0:
+            correct_count += 1
+            
     incorrect_count = total - correct_count
     score = ((3 * correct_count - incorrect_count) / (3 * total)) * 100
     score = max(0.0, round(score, 2))
@@ -79,8 +101,8 @@ def submit_exam(sub: SubmitRequest):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO results (user_id, username, score, correct, incorrect, total) VALUES (?, ?, ?, ?, ?, ?)",
-        (sub.user_id, sub.username, score, correct_count, incorrect_count, total)
+        "INSERT INTO results (user_id, username, subject, score, correct, incorrect, total) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (sub.user_id, sub.username, sub.subject, score, correct_count, incorrect_count, total)
     )
     conn.commit()
     conn.close()

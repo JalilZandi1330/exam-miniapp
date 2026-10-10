@@ -1,0 +1,102 @@
+[
+  {
+    "page": 2,
+    "number": 1,
+    "text": "A\n \n یک ماتریس مربعی است بطوری کهA2 = A\n \n وB = 2 A −I\n ، حاصل ماتریسB2\n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "I\n  \n  \n2)\n B\n \n3\n )\nO̅\n \n4\n )\nA "
+  },
+  {
+    "page": 2,
+    "number": 2,
+    "text": "اگرA = [1\n2\n0\n1]\n \n وA2 = αA + βI\n \n باشد، مقدارα −β\n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "1\n -\n  \n  \n2) 1\n \n3\n )\n2\n \n4\n )\n3 "
+  },
+  {
+    "page": 2,
+    "number": 3,
+    "text": "A\n \n یک ماتریس2 × 2\n \n است بطوریک ه، 𝐴2 + 3𝐴= 𝐼\n \n اگرA3 = αA + βI\n \n آن گاهα + β\n \n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "10\n \n  \n  \n2) \n13\n  \n3\n )\n7\n -\n \n4\n )\n7 "
+  },
+  {
+    "page": 2,
+    "number": 4,
+    "text": "اگرA2 = 3 A\n \n باشد، آن گاهA100\n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "3100A\n  \n  \n2)\n 399A\n \n3\n )\n3100I\n \n4\n )\n399I "
+  },
+  {
+    "page": 2,
+    "number": 5,
+    "text": "اگرA4 = A\n \n باشد، حاصلA77\n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "A\n \n  \n2)\n A2\n \n3\n )\nA3\n \n4\n )\nI "
+  },
+  {
+    "page": 2,
+    "number": 6,
+    "text": "اگرA3 = A\n  \n باشد، حاصلA91\n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "A\n \n  \n2)\n I\n \n3\n )\nA2\n \n4\n )\nO̅ "
+  },
+  {
+    "page": 2,
+    "number": 7,
+    "text": "اگرA = [\n−1\n2\n−1\n3\n1\n2\n2\n−1\n1\n]\n \n ،باشد درایه ی واقع در سطر دوم و ستون سومA3\n کدام است؟"
+  },
+  {
+    "page": 2,
+    "number": 1,
+    "text": "7\n  \n  \n2\n )\n10\n \n3\n )\n4\n \n4\n )\n8  272"
+  },
+  {
+    "page": 3,
+    "number": 8,
+    "text": "اگرA2 = A\n \n باشد، حاصل(2 A −I)5\n کدام است؟"
+  },
+  {
+    "page": 3,
+    "number": 1,
+    "text": "2 A + I\n  \n  \n2)\n 2 A −I\n \n3\n )\n4 A + I\n \n4\n )\n4 A −I "
+  },
+  {
+    "page": 3,
+    "number": 9,
+    "text": "اگرAB = A\n \n وBA = B\n \n ماتریس هایA2\n \n وB2\n به ترتیب کدامند؟"
+  },
+  {
+    "page": 3,
+    "number": 1,
+    "text": "B, A\n  \n  \n2)\n A, B\n \n3\n )\nO̅ , O̅\n \n4\n )\nI, I "
+  },
+  {
+    "page": 3,
+    "number": 10,
+    "text": "اگر𝐴= [\n1\n0\n0\n𝑥\n1\n0\n𝑦\n𝑧\n1\n]\n \n ،باشد درایه ی واقع در سطر دوم و ستون اول ماتریسA3\n کدام است؟"
+  },
+  {
+    "page": 3,
+    "number": 1,
+    "text": "𝑥𝑦+ 𝑥𝑧\n  \n  \n2)\n 𝑥𝑦+ 𝑦𝑧\n \n3\n )\n3𝑥\n \n4\n )\n3𝑧 "
+  }
+]

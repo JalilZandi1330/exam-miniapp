@@ -3,54 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آزمون آنلاین هوشمند</title>
+    <title>سامانه آزمون هوشمند (شبیه ساز کنکور)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4">
-    <div class="max-w-md mx-auto bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-800">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
-            <h1 class="text-lg font-black text-emerald-400">سامانه آزمون آنلاین</h1>
-            <span id="timer" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl font-bold text-amber-400">⏱️ 00:00</span>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+    
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-xl text-xs font-bold">آزمون آنلاین</span>
+            <h1 id="exam-title" class="text-sm font-bold text-slate-200">انتخاب آزمون</h1>
         </div>
-
-        <!-- Subject Selector Screen -->
-        <div id="subject-screen" class="space-y-4">
-            <h2 class="text-md font-bold text-slate-300">موضوع آزمون را انتخاب کنید:</h2>
-            <button onclick="startExam('chem')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl flex items-center justify-between transition group">
-                <span class="font-bold text-emerald-300">🧪 شیمی دوازدهم (شوینده‌ها)</span>
-                <span class="text-xs bg-emerald-900/50 text-emerald-400 px-3 py-1 rounded-xl">شروع</span>
-            </button>
-            <button onclick="startExam('geom')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl flex items-center justify-between transition group">
-                <span class="font-bold text-blue-300">📐 هندسه دوازدهم (ماتریس)</span>
-                <span class="text-xs bg-blue-900/50 text-blue-400 px-3 py-1 rounded-xl">شروع</span>
-            </button>
+        <div id="timer-box" class="hidden items-center gap-2 bg-rose-500/10 border border-rose-500/30 text-rose-400 px-3 py-1 rounded-xl text-xs font-bold">
+            <span>⏱️</span>
+            <span id="timer">00:00</span>
         </div>
+    </header>
 
-        <!-- Quiz Screen -->
-        <div id="quiz-screen" class="hidden">
-            <div id="quiz-container" class="space-y-6"></div>
-            <button id="submit-btn" onclick="submitExam()" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-500 font-bold py-3.5 rounded-2xl shadow-lg transition">ثبت نهایی و دریافت کارنامه</button>
-        </div>
-
-        <!-- Result Screen -->
-        <div id="result-screen" class="hidden text-center space-y-4">
-            <h2 class="text-2xl font-black text-amber-400">کارنامه آزمون</h2>
-            <div id="score-badge" class="text-3xl font-black py-4 bg-slate-800 rounded-2xl border border-slate-700"></div>
-            <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 text-right space-y-2 text-sm">
-                <p id="correct-text" class="text-emerald-400 font-semibold"></p>
-                <p id="incorrect-text" class="text-red-400 font-semibold"></p>
-                <p id="time-text" class="text-slate-400"></p>
+    <main class="max-w-4xl mx-auto p-4 pb-24">
+        
+        <!-- Subject Selector -->
+        <div id="screen-home" class="space-y-6 mt-6">
+            <div class="bg-gradient-to-l from-emerald-900/40 to-slate-800/60 p-6 rounded-3xl border border-emerald-500/20 shadow-xl">
+                <h2 class="text-xl font-black text-emerald-400 mb-2">به پنل آزمون خوش آمدید 👋</h2>
+                <p class="text-xs text-slate-400 leading-relaxed">مشابه پنل‌های استاندارد کنکور (ماز/قلم‌چی) با قابلیت پالت سوالات، پاسخ‌برگ دیجیتال و تحلیل کارنامه.</p>
             </div>
-            <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-bold text-sm transition">بازگشت به منوی اصلی</button>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div onclick="startExam('chem')" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-emerald-500/50 p-5 rounded-3xl cursor-pointer transition shadow-lg group">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-2xl">🧪</span>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg font-bold">۲ سوال تستی</span>
+                    </div>
+                    <h3 class="font-bold text-slate-100 group-hover:text-emerald-400 transition">شیمی دوازدهم - شوینده‌ها</h3>
+                    <p class="text-xs text-slate-400 mt-1">بررسی ساختار صابون، اسیدهای چرب و آب سخت</p>
+                </div>
+
+                <div onclick="startExam('geom')" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500/50 p-5 rounded-3xl cursor-pointer transition shadow-lg group">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-2xl">📐</span>
+                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg font-bold">تست‌های استاندارد</span>
+                    </div>
+                    <h3 class="font-bold text-slate-100 group-hover:text-blue-400 transition">هندسه دوازدهم - ماتریس</h3>
+                    <p class="text-xs text-slate-400 mt-1">بانک تست کامل ماتریس‌ها و دترمینان</p>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <!-- Exam Screen (Maz Style) -->
+        <div id="screen-exam" class="hidden grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
+            <!-- Question Area (3 cols) -->
+            <div class="lg:col-span-3 space-y-4">
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-3xl p-6 shadow-xl relative min-h-[350px] flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-700/60 pb-3">
+                            <span id="q-badge" class="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-xl font-bold">سوال ۱</span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleMark()" id="mark-btn" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-xl transition">⭐ نشان‌دار کردن</button>
+                            </div>
+                        </div>
+                        <p id="q-text" class="text-sm font-semibold text-slate-100 leading-loose mb-6"></p>
+                        <div id="options-container" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-700/60">
+                        <button onclick="prevQuestion()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition">قبلی</button>
+                        <button onclick="nextQuestion()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg">بعدی</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Palette Sidebar (1 col) -->
+            <div class="lg:col-span-1 space-y-4">
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-3xl p-4 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-300 mb-3 text-center">پاسخ‌برگ دیجیتال</h3>
+                    <div id="palette-grid" class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto p-1"></div>
+                    
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 space-y-2 text-[10px] text-slate-400">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> پاسخ داده شده</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> نشان‌دار شده</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-700 inline-block"></span> پاسخ داده نشده</div>
+                    </div>
+
+                    <button onclick="confirmSubmit()" class="w-full mt-4 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg">پایان آزمون و ثبت</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Card Screen -->
+        <div id="screen-result" class="hidden max-w-xl mx-auto space-y-6 mt-6">
+            <div class="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 shadow-2xl text-center space-y-4">
+                <div class="inline-flex p-4 bg-emerald-500/10 text-emerald-400 rounded-full text-3xl">🏆</div>
+                <h2 class="text-xl font-black text-slate-100">کارنامه نهایی آزمون</h2>
+                <div id="final-score-box" class="text-4xl font-black text-amber-400 py-3">0.0%</div>
+                
+                <div class="grid grid-cols-3 gap-3 text-xs font-bold">
+                    <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-emerald-400">
+                        <span class="block text-slate-400 text-[10px] mb-1">درست</span>
+                        <span id="res-correct" class="text-base">0</span>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-rose-400">
+                        <span class="block text-slate-400 text-[10px] mb-1">غلط</span>
+                        <span id="res-incorrect" class="text-base">0</span>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-slate-300">
+                        <span class="block text-slate-400 text-[10px] mb-1">نزده</span>
+                        <span id="res-blank" class="text-base">0</span>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-2xl text-xs transition shadow-lg">بازگشت به منوی آزمون‌ها</button>
+            </div>
+        </div>
+
+    </main>
 
     <script>
         let questions = [];
-        let userAnswers = {};
-        let currentSubject = '';
+        let currentIndex = 0;
+        let userAnswers = {}; // qId -> optionIndex
+        let markedQuestions = new Set();
         let startTime = 0;
         let timerInterval = null;
         
@@ -58,10 +132,11 @@
         tg.expand();
 
         async function startExam(subject) {
-            currentSubject = subject;
-            document.getElementById('subject-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            document.getElementById('timer-box').classList.remove('hidden');
+            document.getElementById('exam-title').innerText = subject === 'chem' ? 'شیمی دوازدهم' : 'هندسه دوازدهم';
+
             startTime = Date.now();
             startTimer();
 
@@ -69,9 +144,11 @@
                 const res = await fetch('questions.json');
                 const data = await res.json();
                 questions = data[subject];
-                renderQuiz();
+                currentIndex = 0;
+                renderQuestion();
+                renderPalette();
             } catch (err) {
-                document.getElementById('quiz-container').innerHTML = '<p class="text-red-400 text-center">خطا در بارگذاری سوالات</p>';
+                alert('خطا در بارگذاری سوالات');
             }
         }
 
@@ -80,56 +157,132 @@
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
                 const secs = String(elapsed % 60).padStart(2, '0');
-                document.getElementById('timer').innerText = `⏱️ ${mins}:${secs}`;
+                document.getElementById('timer').innerText = `${mins}:${secs}`;
             }, 1000);
         }
 
-        function renderQuiz() {
-            const container = document.getElementById('quiz-container');
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('q-badge').innerText = `سوال ${currentIndex + 1} از ${questions.length}`;
+            document.getElementById('q-text').innerText = q.question;
+            
+            const markBtn = document.getElementById('mark-btn');
+            if (markedQuestions.has(currentIndex)) {
+                markBtn.className = "text-xs bg-amber-500/20 text-amber-400 border border-amber-500/40 px-3 py-1 rounded-xl transition";
+                markBtn.innerText = "⭐ نشان‌دار شده";
+            } else {
+                markBtn.className = "text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-xl transition";
+                markBtn.innerText = "⭐ نشان‌دار کردن";
+            }
+
+            const container = document.getElementById('options-container');
             let html = '';
-            questions.forEach((q, index) => {
-                html += `<div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-800">
-                    <p class="font-bold text-sm mb-3 text-slate-200">${index + 1}. ${q.question}</p>
-                    <div class="space-y-2">`;
-                q.options.forEach((opt, optIndex) => {
-                    html += `<label class="flex items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500 cursor-pointer transition">
-                        <input type="radio" name="q_${q.id}" value="${optIndex}" onchange="userAnswers[${q.id}] = ${optIndex}" class="accent-emerald-500">
-                        <span class="text-xs text-slate-300">${opt}</span>
-                    </label>`;
-                });
-                html += `</div></div>`;
+            q.options.forEach((opt, optIndex) => {
+                const isSelected = userAnswers[q.id] === optIndex;
+                const activeClass = isSelected ? 'bg-emerald-500/20 border-emerald-500 text-emerald-200' : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:border-slate-500';
+                
+                html += `<div onclick="selectOption(${q.id}, ${optIndex})" class="flex items-center gap-3 p-3.5 rounded-2xl border ${activeClass} cursor-pointer transition">
+                    <span class="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400">${optIndex + 1}</span>
+                    <span class="text-xs">${opt}</span>
+                </div>`;
             });
             container.innerHTML = html;
         }
 
+        function selectOption(qId, optIndex) {
+            userAnswers[qId] = optIndex;
+            renderQuestion();
+            renderPalette();
+        }
+
+        function toggleMark() {
+            if (markedQuestions.has(currentIndex)) {
+                markedQuestions.delete(currentIndex);
+            } else {
+                markedQuestions.add(currentIndex);
+            }
+            renderQuestion();
+            renderPalette();
+        }
+
+        function renderPalette() {
+            const grid = document.getElementById('palette-grid');
+            let html = '';
+            questions.forEach((q, idx) => {
+                let bgClass = 'bg-slate-700 text-slate-300'; // unanswered
+                if (userAnswers[q.id] !== undefined) {
+                    bgClass = 'bg-emerald-600 text-white font-bold'; // answered
+                }
+                if (markedQuestions.has(idx)) {
+                    bgClass = 'bg-amber-500 text-white font-bold'; // marked
+                }
+                if (idx === currentIndex) {
+                    bgClass += ' ring-2 ring-white';
+                }
+
+                html += `<button onclick="goToQuestion(${idx})" class="w-9 h-9 rounded-xl text-xs flex items-center justify-center transition ${bgClass}">${idx + 1}</button>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        function goToQuestion(idx) {
+            currentIndex = idx;
+            renderQuestion();
+            renderPalette();
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+                renderPalette();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+                renderPalette();
+            }
+        }
+
+        function confirmSubmit() {
+            if (confirm("آیا از ثبت نهایی آزمون اطمینان دارید؟")) {
+                submitExam();
+            }
+        }
+
         function submitExam() {
             clearInterval(timerInterval);
-            const timeSpent = Math.floor((Date.now() - startTime) / 1000);
             
             let correctCount = 0;
+            let blankCount = 0;
             let total = questions.length;
 
             questions.forEach(q => {
-                if (userAnswers[q.id] === q.correct) {
+                if (userAnswers[q.id] === undefined) {
+                    blankCount++;
+                } else if (userAnswers[q.id] === q.correct) {
                     correctCount++;
                 }
             });
 
-            let incorrectCount = total - correctCount;
+            let incorrectCount = total - correctCount - blankCount;
             let score = ((3 * correctCount - incorrectCount) / (3 * total)) * 100;
             score = Math.max(0, Math.round(score * 100) / 100);
 
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('timer-box').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
             
-            document.getElementById('score-badge').innerText = `${score}%`;
-            document.getElementById('correct-text').innerText = `✔️ پاسخ‌های درست: ${correctCount}`;
-            document.getElementById('incorrect-text').innerText = `❌ پاسخ‌های غلط: ${incorrectCount}`;
-            document.getElementById('time-text').innerText = `⏳ زمان صرف شده: ${timeSpent} ثانیه`;
+            document.getElementById('final-score-box').innerText = `${score}%`;
+            document.getElementById('res-correct').innerText = correctCount;
+            document.getElementById('res-incorrect').innerText = incorrectCount;
+            document.getElementById('res-blank').innerText = blankCount;
 
-            // Optional: send score back to Telegram bot via WebApp
             if (tg.sendData) {
-                tg.sendData(JSON.stringify({ subject: currentSubject, score: score }));
+                tg.sendData(JSON.stringify({ score: score, correct: correctCount }));
             }
         }
     </script>

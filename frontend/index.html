@@ -26,10 +26,6 @@
                 <span class="font-bold text-blue-300">📐 هندسه دوازدهم (ماتریس)</span>
                 <span class="text-xs bg-blue-900/50 text-blue-400 px-3 py-1 rounded-xl">شروع</span>
             </button>
-            
-            <button onclick="showLeaderboard()" class="w-full mt-6 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 p-3 rounded-xl font-bold text-sm transition">
-                🏆 مشاهده جدول رتبه‌بندی (۳۰ نفر برتر)
-            </button>
         </div>
 
         <!-- Quiz Screen -->
@@ -48,13 +44,6 @@
                 <p id="time-text" class="text-slate-400"></p>
             </div>
             <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-bold text-sm transition">بازگشت به منوی اصلی</button>
-        </div>
-
-        <!-- Leaderboard Screen -->
-        <div id="leaderboard-screen" class="hidden space-y-4">
-            <h2 class="text-lg font-black text-amber-400 text-center">🏆 رتبه‌بندی برترین‌ها</h2>
-            <div id="leaderboard-list" class="space-y-2 max-h-80 overflow-y-auto"></div>
-            <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-bold text-sm transition">بازگشت</button>
         </div>
     </div>
 
@@ -77,9 +66,9 @@
             startTimer();
 
             try {
-                const res = await fetch(`/api/questions/${subject}`);
+                const res = await fetch('questions.json');
                 const data = await res.json();
-                questions = data.questions;
+                questions = data[subject];
                 renderQuiz();
             } catch (err) {
                 document.getElementById('quiz-container').innerHTML = '<p class="text-red-400 text-center">خطا در بارگذاری سوالات</p>';
@@ -113,69 +102,34 @@
             container.innerHTML = html;
         }
 
-        async function submitExam() {
+        function submitExam() {
             clearInterval(timerInterval);
             const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-            const userId = tg.initDataUnsafe?.user?.id || 'guest_user';
-            const username = tg.initDataUnsafe?.user?.username || 'کاربر مهمان';
+            
+            let correctCount = 0;
+            let total = questions.length;
 
-            try {
-                const res = await fetch('/api/submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        user_id: String(userId), 
-                        username: username, 
-                        subject: currentSubject,
-                        time_spent: timeSpent,
-                        answers: userAnswers 
-                    })
-                });
-                const result = await res.json();
-                
-                document.getElementById('quiz-screen').classList.add('hidden');
-                document.getElementById('result-screen').classList.remove('hidden');
-                
-                document.getElementById('score-badge').innerText = `${result.score}%`;
-                document.getElementById('correct-text').innerText = `✔️ پاسخ‌های درست: ${result.correct}`;
-                document.getElementById('incorrect-text').innerText = `❌ پاسخ‌های غلط: ${result.incorrect}`;
-                document.getElementById('time-text').innerText = `⏳ زمان صرف شده: ${result.time_spent} ثانیه`;
-            } catch (err) {
-                alert('خطا در ثبت آزمون!');
-            }
-        }
-
-        async function showLeaderboard() {
-            document.getElementById('subject-screen').classList.add('hidden');
-            document.getElementById('leaderboard-screen').classList.remove('hidden');
-
-            try {
-                const res = await fetch('/api/leaderboard/geom');
-                const data = await res.json();
-                const list = document.getElementById('leaderboard-list');
-                
-                if (data.leaderboard.length === 0) {
-                    list.innerHTML = '<p class="text-center text-slate-400 text-sm">هنوز کسی آزمونی نداده است.</p>';
-                    return;
+            questions.forEach(q => {
+                if (userAnswers[q.id] === q.correct) {
+                    correctCount++;
                 }
+            });
 
-                let html = '';
-                data.leaderboard.forEach(item => {
-                    html += `<div class="flex justify-between items-center bg-slate-800 p-3 rounded-xl border border-slate-700 text-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-amber-400">#${item.rank}</span>
-                            <span class="text-slate-200">@${item.username}</span>
-                        </div>
-                        <div class="text-left">
-                            <span class="font-bold text-emerald-400">${item.score}%</span>
-                            <span class="text-xs text-slate-400 block">${item.time_spent}</span>
-                        </div>
-                    </div>`;
-                });
-                list.html = html; // Wait, list.innerHTML
-                list.innerHTML = html;
-            } catch (err) {
-                document.getElementById('leaderboard-list').innerHTML = '<p class="text-red-400 text-center text-sm">خطا در دریافت جدول رتبه‌بندی</p>';
+            let incorrectCount = total - correctCount;
+            let score = ((3 * correctCount - incorrectCount) / (3 * total)) * 100;
+            score = Math.max(0, Math.round(score * 100) / 100);
+
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            document.getElementById('score-badge').innerText = `${score}%`;
+            document.getElementById('correct-text').innerText = `✔️ پاسخ‌های درست: ${correctCount}`;
+            document.getElementById('incorrect-text').innerText = `❌ پاسخ‌های غلط: ${incorrectCount}`;
+            document.getElementById('time-text').innerText = `⏳ زمان صرف شده: ${timeSpent} ثانیه`;
+
+            // Optional: send score back to Telegram bot via WebApp
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify({ subject: currentSubject, score: score }));
             }
         }
     </script>

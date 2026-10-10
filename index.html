@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آزمون آنلاین هوشمند</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4">
+    <div class="max-w-md mx-auto bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-800">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+            <h1 class="text-lg font-black text-emerald-400">سامانه آزمون آنلاین</h1>
+            <span id="timer" class="text-xs bg-slate-800 px-3 py-1.5 rounded-xl font-bold text-amber-400">⏱️ 00:00</span>
+        </div>
+
+        <!-- Subject Selector Screen -->
+        <div id="subject-screen" class="space-y-4">
+            <h2 class="text-md font-bold text-slate-300">موضوع آزمون را انتخاب کنید:</h2>
+            <button onclick="startExam('chem')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl flex items-center justify-between transition group">
+                <span class="font-bold text-emerald-300">🧪 شیمی دوازدهم (شوینده‌ها)</span>
+                <span class="text-xs bg-emerald-900/50 text-emerald-400 px-3 py-1 rounded-xl">شروع</span>
+            </button>
+            <button onclick="startExam('geom')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl flex items-center justify-between transition group">
+                <span class="font-bold text-blue-300">📐 هندسه دوازدهم (ماتریس)</span>
+                <span class="text-xs bg-blue-900/50 text-blue-400 px-3 py-1 rounded-xl">شروع</span>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <div id="quiz-container" class="space-y-6"></div>
+            <button id="submit-btn" onclick="submitExam()" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-500 font-bold py-3.5 rounded-2xl shadow-lg transition">ثبت نهایی و دریافت کارنامه</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden text-center space-y-4">
+            <h2 class="text-2xl font-black text-amber-400">کارنامه آزمون</h2>
+            <div id="score-badge" class="text-3xl font-black py-4 bg-slate-800 rounded-2xl border border-slate-700"></div>
+            <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 text-right space-y-2 text-sm">
+                <p id="correct-text" class="text-emerald-400 font-semibold"></p>
+                <p id="incorrect-text" class="text-red-400 font-semibold"></p>
+                <p id="time-text" class="text-slate-400"></p>
+            </div>
+            <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-bold text-sm transition">بازگشت به منوی اصلی</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let userAnswers = {};
+        let currentSubject = '';
+        let startTime = 0;
+        let timerInterval = null;
+        
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        async function startExam(subject) {
+            currentSubject = subject;
+            document.getElementById('subject-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            startTime = Date.now();
+            startTimer();
+
+            try {
+                const res = await fetch('questions.json');
+                const data = await res.json();
+                questions = data[subject];
+                renderQuiz();
+            } catch (err) {
+                document.getElementById('quiz-container').innerHTML = '<p class="text-red-400 text-center">خطا در بارگذاری سوالات</p>';
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const secs = String(elapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `⏱️ ${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `<div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-800">
+                    <p class="font-bold text-sm mb-3 text-slate-200">${index + 1}. ${q.question}</p>
+                    <div class="space-y-2">`;
+                q.options.forEach((opt, optIndex) => {
+                    html += `<label class="flex items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500 cursor-pointer transition">
+                        <input type="radio" name="q_${q.id}" value="${optIndex}" onchange="userAnswers[${q.id}] = ${optIndex}" class="accent-emerald-500">
+                        <span class="text-xs text-slate-300">${opt}</span>
+                    </label>`;
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+            
+            let correctCount = 0;
+            let total = questions.length;
+
+            questions.forEach(q => {
+                if (userAnswers[q.id] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            let incorrectCount = total - correctCount;
+            let score = ((3 * correctCount - incorrectCount) / (3 * total)) * 100;
+            score = Math.max(0, Math.round(score * 100) / 100);
+
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            document.getElementById('score-badge').innerText = `${score}%`;
+            document.getElementById('correct-text').innerText = `✔️ پاسخ‌های درست: ${correctCount}`;
+            document.getElementById('incorrect-text').innerText = `❌ پاسخ‌های غلط: ${incorrectCount}`;
+            document.getElementById('time-text').innerText = `⏳ زمان صرف شده: ${timeSpent} ثانیه`;
+
+            // Optional: send score back to Telegram bot via WebApp
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify({ subject: currentSubject, score: score }));
+            }
+        }
+    </script>
+</body>
+</html>
